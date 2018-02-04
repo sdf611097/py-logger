@@ -1,14 +1,18 @@
 import time
 import os
+import inspect
+from sys import stderr
 
 ENV_DEBUG_MODE = 'VERBOSE'
 ENV_ENABLE_TIME = 'ENABLE_TIME'
-
-def getEnvOpt(envName):
-    return False if envName not in os.environ else os.environ[envName]
+ENV_LINE_INFO_TO_STDERR = 'LINE_INFO_TO_STDERR'
+def getEnvOpt(envName, default=False):
+    return default if envName not in os.environ else os.environ[envName]
 
 ENABLE_DEBUG_MODE = getEnvOpt(ENV_DEBUG_MODE)
 ENABLE_TIME_PREFIX = getEnvOpt(ENV_ENABLE_TIME)
+ENABLE_LINE_INFO_TO_STDERR = getEnvOpt(ENV_LINE_INFO_TO_STDERR)
+
 timeformat = '[%m-%d %H:%M:%S]'
 
 END = '\x1b[0m'
@@ -47,7 +51,7 @@ _CODE_DICT = {**_bgColors, **_effects, **_colors}
 def getPrefix(codes):
     return '\x1b[' + ';'.join(codes) + 'm'
 
-def _log(codes, *args):
+def _log(codes, *args, **kwargs):
     '''
     This is core function
     '''
@@ -57,7 +61,7 @@ def _log(codes, *args):
         arguments.insert(0, time.strftime(timeformat))
 
     arguments.append(END)
-    print(*arguments)
+    print(*arguments, **kwargs)
 
 def cyan(*args):
     _log([_colors['CYAN']], *args)
@@ -85,6 +89,19 @@ def log(opts, *args):
         print('below are possible options(case insensitive)')
         showOpts()
 
+def printLineInfo(*args, **kwargs):
+    '''
+    This function will print Filename/functionName:line at beggining.
+    You can set environment variable LINE_INFO_TO_STDERR=1 to print this one to stderr
+    '''
+    previous_frame = inspect.currentframe().f_back
+    (filename, line_number, function_name, _, _) = inspect.getframeinfo(previous_frame)
+    lineInfo = filename + '/' + function_name + ':' + str(line_number)
+    if ENABLE_LINE_INFO_TO_STDERR:
+        _log([_colors['RED']], lineInfo, *args, file=stderr)
+    else:
+        _log([_colors['RED']], lineInfo, *args)
+
 def debug(opts, *args):
     if ENABLE_DEBUG_MODE:
         log(opts, *args)
@@ -95,3 +112,8 @@ red(3,2,1)
 
 log(['red','Bg_Yellow', 'wrongOpt'], 3,4,5)
 debug(['BG_CYAN'], 'this is debug msg')
+
+printLineInfo()
+def test():
+    printLineInfo('1','2')
+test()
