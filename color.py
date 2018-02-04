@@ -1,3 +1,11 @@
+import time
+import os
+
+ENV_CT_LOGGER_ENABLE_TIME = 'ENABLE_TIME'
+
+ENABLE_TIME_PREFIX = False if ENV_CT_LOGGER_ENABLE_TIME not in os.environ else os.environ[ENV_CT_LOGGER_ENABLE_TIME]
+timeformat = '[%m-%d %H:%M:%S]'
+
 END = '\x1b[0m'
 _bgColors = {
     'BG_BLACK': '40',
@@ -19,7 +27,7 @@ _effects = {
 }
 
 _colors = {
-	'BLACK': '30',
+    'BLACK': '30',
     'RED': '31',
     'GREEN': '32',
     'YELLOW': '33',
@@ -32,23 +40,26 @@ _colors = {
 _CODE_DICT = {**_bgColors, **_effects, **_colors}
 
 def getPrefix(codes):
-	return '\x1b[' + ';'.join(codes) + 'm'
+    return '\x1b[' + ';'.join(codes) + 'm'
 
 def _log(codes, *args):
-	'''
-	This is core function
-	'''
-	arguments = list(args)
-	arguments.insert(0, getPrefix(codes))
-	arguments.append(END)
-	print(*arguments)
+    '''
+    This is core function
+    '''
+    arguments = list(args)
+    arguments.insert(0, getPrefix(codes))
+    if ENABLE_TIME_PREFIX :
+        arguments.insert(0, time.strftime(timeformat))
+
+    arguments.append(END)
+    print(*arguments)
 
 def cyan(*args):
-	_log([_colors['CYAN']], *args)
+    _log([_colors['CYAN']], *args)
 def red(*args):
-	_log([_colors['RED']], *args)
+    _log([_colors['RED']], *args)
 def italic(*args):
-	_log([_effects['ITALIC']], *args)
+    _log([_effects['ITALIC']], *args)
 
 def showOpts():
     def show(title, d):
