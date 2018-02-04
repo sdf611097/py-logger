@@ -1,9 +1,14 @@
 import time
 import os
 
-ENV_CT_LOGGER_ENABLE_TIME = 'ENABLE_TIME'
+ENV_DEBUG_MODE = 'VERBOSE'
+ENV_ENABLE_TIME = 'ENABLE_TIME'
 
-ENABLE_TIME_PREFIX = False if ENV_CT_LOGGER_ENABLE_TIME not in os.environ else os.environ[ENV_CT_LOGGER_ENABLE_TIME]
+def getEnvOpt(envName):
+    return False if envName not in os.environ else os.environ[envName]
+
+ENABLE_DEBUG_MODE = getEnvOpt(ENV_DEBUG_MODE)
+ENABLE_TIME_PREFIX = getEnvOpt(ENV_ENABLE_TIME)
 timeformat = '[%m-%d %H:%M:%S]'
 
 END = '\x1b[0m'
@@ -80,9 +85,13 @@ def log(opts, *args):
         print('below are possible options(case insensitive)')
         showOpts()
 
+def debug(opts, *args):
+    if ENABLE_DEBUG_MODE:
+        log(opts, *args)
 
 _log([_colors['RED'], _effects['ITALIC'], _bgColors['BG_GREEN']],1,2,3)
 
 red(3,2,1)
 
 log(['red','Bg_Yellow', 'wrongOpt'], 3,4,5)
+debug(['BG_CYAN'], 'this is debug msg')
