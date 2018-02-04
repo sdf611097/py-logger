@@ -96,11 +96,16 @@ def printLineInfo(*args, **kwargs):
     '''
     previous_frame = inspect.currentframe().f_back
     (filename, line_number, function_name, _, _) = inspect.getframeinfo(previous_frame)
-    lineInfo = filename + '/' + function_name + ':' + str(line_number)
+    lineInfo = filename + ':' + str(line_number)+ '/' + function_name
     if ENABLE_LINE_INFO_TO_STDERR:
         _log([_colors['RED']], lineInfo, *args, file=stderr)
     else:
         _log([_colors['RED']], lineInfo, *args)
+
+def printStack():
+    frames = inspect.getouterframes(inspect.currentframe().f_back)
+    for f in frames:
+        print(f.filename+':'+ str(f.lineno)+'/'+f.function, f.code_context[0].replace(' ',''), end='')
 
 def debug(opts, *args):
     if ENABLE_DEBUG_MODE:
@@ -114,6 +119,10 @@ log(['red','Bg_Yellow', 'wrongOpt'], 3,4,5)
 debug(['BG_CYAN'], 'this is debug msg')
 
 printLineInfo()
+
 def test():
     printLineInfo('1','2')
-test()
+    printStack()
+def a():
+    test()
+a()
