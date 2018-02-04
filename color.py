@@ -62,27 +62,20 @@ _CODE_DICT = {**_bgColors, **_effects, **_colors}
 def getAllOptions():
     return _CODE_DICT.keys()
 
-def getPrefix(codes):
+def _transformCodes(codes):
     return '\x1b[' + ';'.join(codes) + 'm'
 
-def _log(codes, *args, **kwargs):
+def byCodes(codes, *args, **kwargs):
     '''
     This is core function
     '''
     arguments = list(args)
-    arguments.insert(0, getPrefix(codes))
+    arguments.insert(0, _transformCodes(codes))
     if ENABLE_TIME_PREFIX :
         arguments.insert(0, time.strftime(timeformat))
 
     arguments.append(END)
     print(*arguments, **kwargs)
-
-# def cyan(*args):
-#     _log([_colors['CYAN']], *args)
-# def red(*args):
-#     _log([_colors['RED']], *args)
-# def italic(*args):
-#     _log([_effects['ITALIC']], *args)
 
 def _show(title, d):
     cyan(title)
@@ -101,16 +94,21 @@ def showOpts():
     _show('EFFECTS', _effects)
     _show('COLORS', _colors)
 
-def log(opts, *args):
+def optsToCodes(opts):
     optsUpper = [opt.upper() for opt in opts ]
     try:
         codes = [_CODE_DICT[opt] for opt in optsUpper]
-        _log(codes, *args)
+        return codes
     except KeyError:
         opts.insert(0,'Unexpected options:')
         red(*opts)
         print('below are possible options(case insensitive)')
         showOpts()
+def log(opts, *args):
+    codes = optsToCodes(opts)
+    if codes:
+        byCodes(codes, *args)
+
 
 def printLineInfo(*args, **kwargs):
     '''
@@ -121,9 +119,9 @@ def printLineInfo(*args, **kwargs):
     (filename, line_number, function_name, _, _) = inspect.getframeinfo(previous_frame)
     lineInfo = filename + ':' + str(line_number)+ '/' + function_name
     if ENABLE_LINE_INFO_TO_STDERR:
-        _log([_colors['RED']], lineInfo, *args, file=stderr)
+        byCodes([_colors['RED']], lineInfo, *args, file=stderr)
     else:
-        _log([_colors['RED']], lineInfo, *args)
+        byCodes([_colors['RED']], lineInfo, *args)
 
 def printStack():
     frames = inspect.getouterframes(inspect.currentframe().f_back)
@@ -144,6 +142,15 @@ def bgColorShorthand(bgColor):
         except KeyError:
             _show('BG_COLORS', _bgColors)
     return withBgColor
+
+def start(*opts):
+    codes = optsToCodes(opts)
+    print(_transformCodes(codes), end='')
+def end():
+    #Once start with bg color
+    #Although using RESET to clear bgColor, but the spaces at the end still remain 1 line
+    #Seems there a bug on osx?
+    print(_transformCodes(['21', '22', '23', '24',_effects['RESET']]),end='')
 
 black = oneOpt('black')
 red = oneOpt('red')
@@ -168,9 +175,8 @@ bg_magenta = bgColorShorthand('bg_magenta')
 bg_cyan = bgColorShorthand('bg_cyan')
 bg_white = bgColorShorthand('bg_white')
 
-_log([_colors['RED'], _effects['ITALIC'], _bgColors['BG_GREEN']],1,2,3)
+byCodes([_colors['RED'], _effects['ITALIC'], _bgColors['BG_GREEN']],1,2,3)
 
-red(3,2,1)
 
 log(['red','Bg_Yellow', 'wrongOpt'], 3,4,5)
 debug(['BG_CYAN'], 'this is debug msg')
@@ -188,3 +194,10 @@ green(123,'abc')
 cyan('aa')
 
 bg_yellow('log with bg yellow')
+print('start','italic blue bg_green')
+
+start('italic','blue','bg_green')
+print('first','line')
+end()
+print('after','end()')
+print('after','end()')
