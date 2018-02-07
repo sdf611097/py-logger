@@ -4,13 +4,13 @@ import inspect
 from sys import stderr
 
 ENV_DEBUG_MODE = 'VERBOSE'
-ENV_ENABLE_TIME = 'ENABLE_TIME'
+ENV_ENABLE_TIME_PREFIX = 'ENABLE_TIME_PREFIX'
 ENV_LINE_INFO_TO_STDERR = 'LINE_INFO_TO_STDERR'
 def _getEnvOpt(envName, default=False):
     return default if envName not in os.environ else os.environ[envName]
 
 ENABLE_DEBUG_MODE = _getEnvOpt(ENV_DEBUG_MODE)
-ENABLE_TIME_PREFIX = _getEnvOpt(ENV_ENABLE_TIME)
+ENABLE_TIME_PREFIX = _getEnvOpt(ENV_ENABLE_TIME_PREFIX)
 ENABLE_LINE_INFO_TO_STDERR = _getEnvOpt(ENV_LINE_INFO_TO_STDERR)
 
 timeformat = '[%m-%d %H:%M:%S]'
@@ -94,7 +94,7 @@ def showOpts():
     _show('EFFECTS', _effects)
     _show('COLORS', _colors)
 
-def optsToCodes(opts):
+def _optsToCodes(opts):
     optsUpper = [opt.upper() for opt in opts ]
     try:
         codes = [_CODE_DICT[opt] for opt in optsUpper]
@@ -105,7 +105,7 @@ def optsToCodes(opts):
         print('below are possible options(case insensitive)')
         showOpts()
 def log(opts, *args):
-    codes = optsToCodes(opts)
+    codes = _optsToCodes(opts)
     if codes:
         byCodes(codes, *args)
 
@@ -132,10 +132,10 @@ def debug(opts, *args):
     if ENABLE_DEBUG_MODE:
         log(opts, *args)
 
-def oneOpt(opt):
+def _oneOpt(opt):
     return lambda *args: log([opt], *args)
 
-def bgColorShorthand(bgColor):
+def _bgColorShorthand(bgColor):
     def withBgColor(*args):
         try:
             log([bgColor, _fontColorForBGs[bgColor.upper()]], *args)
@@ -144,7 +144,7 @@ def bgColorShorthand(bgColor):
     return withBgColor
 
 def start(*opts):
-    codes = optsToCodes(opts)
+    codes = _optsToCodes(opts)
     print(_transformCodes(codes), end='')
 def end():
     #Once start with bg color
@@ -152,52 +152,55 @@ def end():
     #Seems there a bug on osx?
     print(_transformCodes(['21', '22', '23', '24',_effects['RESET']]),end='')
 
-black = oneOpt('black')
-red = oneOpt('red')
-green = oneOpt('green')
-yellow = oneOpt('yellow')
-blue = oneOpt('blue')
-magenta = oneOpt('magenta')
-cyan = oneOpt('cyan')
-white = oneOpt('white')
+black = _oneOpt('black')
+red = _oneOpt('red')
+green = _oneOpt('green')
+yellow = _oneOpt('yellow')
+blue = _oneOpt('blue')
+magenta = _oneOpt('magenta')
+cyan = _oneOpt('cyan')
+white = _oneOpt('white')
 
-bold = oneOpt('bold')
-faint = oneOpt('faint')
-italic = oneOpt('italic')
-underline = oneOpt('underline')
+bold = _oneOpt('bold')
+faint = _oneOpt('faint')
+italic = _oneOpt('italic')
+underline = _oneOpt('underline')
 
-bg_black = bgColorShorthand('bg_black')
-bg_red = bgColorShorthand('bg_red')
-bg_green = bgColorShorthand('bg_green')
-bg_yellow = bgColorShorthand('bg_yellow')
-bg_blue = bgColorShorthand('bg_blue')
-bg_magenta = bgColorShorthand('bg_magenta')
-bg_cyan = bgColorShorthand('bg_cyan')
-bg_white = bgColorShorthand('bg_white')
-
-byCodes([_colors['RED'], _effects['ITALIC'], _bgColors['BG_GREEN']],1,2,3)
+bgBlack = _bgColorShorthand('bg_black')
+bgRed = _bgColorShorthand('bg_red')
+bgGreen = _bgColorShorthand('bg_green')
+bgYellow = _bgColorShorthand('bg_yellow')
+bgBlue = _bgColorShorthand('bg_blue')
+bgMagenta = _bgColorShorthand('bg_magenta')
+bgCyan = _bgColorShorthand('bg_cyan')
+bgWhite = _bgColorShorthand('bg_white')
 
 
-log(['red','Bg_Yellow', 'wrongOpt'], 3,4,5)
-debug(['BG_CYAN'], 'this is debug msg')
+if __name__ == '__main__':
 
-printLineInfo()
+    byCodes([_colors['RED'], _effects['ITALIC'], _bgColors['BG_GREEN']],1,2,3)
 
-def test():
-    printLineInfo('1','2')
-    printStack()
-def a():
-    test()
-a()
 
-green(123,'abc')
-cyan('aa')
+    log(['red','Bg_Yellow', 'wrongOpt'], 3,4,5)
+    debug(['BG_CYAN'], 'this is debug msg')
 
-bg_yellow('log with bg yellow')
-print('start','italic blue bg_green')
+    printLineInfo()
 
-start('italic','blue','bg_green')
-print('first','line')
-end()
-print('after','end()')
-print('after','end()')
+    def test():
+        printLineInfo('1','2')
+        printStack()
+    def a():
+        test()
+    a()
+
+    green(123,'abc')
+    cyan('aa')
+
+    bgYellow('log with bg yellow')
+    print('start','italic blue bg_green')
+
+    start('italic','blue','bg_green')
+    print('first','line')
+    end()
+    print('after','end()')
+    print('after','end()')
