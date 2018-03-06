@@ -8,13 +8,9 @@ ENV_ENABLE_TIME_PREFIX = 'ENABLE_TIME_PREFIX'
 ENV_LINE_INFO_TO_STDERR = 'LINE_INFO_TO_STDERR'
 
 
-def _get_env_opt(env_name, default=False):
-    return default if env_name not in os.environ else os.environ[env_name]
-
-
-ENABLE_DEBUG_MODE = _get_env_opt(ENV_DEBUG_MODE)
-ENABLE_TIME_PREFIX = _get_env_opt(ENV_ENABLE_TIME_PREFIX)
-ENABLE_LINE_INFO_TO_STDERR = _get_env_opt(ENV_LINE_INFO_TO_STDERR)
+ENABLE_DEBUG_MODE = os.environ.get(ENV_DEBUG_MODE)
+ENABLE_TIME_PREFIX = os.environ.get(ENV_ENABLE_TIME_PREFIX)
+ENABLE_LINE_INFO_TO_STDERR = os.environ.get(ENV_LINE_INFO_TO_STDERR)
 
 time_format = '[%m-%d %H:%M:%S]'
 
