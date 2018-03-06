@@ -128,11 +128,11 @@ def print_line_info(*args, **kwargs):
     """
     previous_frame = inspect.currentframe().f_back
     (filename, line_number, function_name, _, _) = inspect.getframeinfo(previous_frame)
-    lineInfo = filename + ':' + str(line_number) + '/' + function_name
+    line_info = filename + ':' + str(line_number) + '/' + function_name
     if ENABLE_LINE_INFO_TO_STDERR:
-        by_codes([_colors['RED']], lineInfo, *args, file=stderr)
+        by_codes([_colors['RED']], line_info, *args, file=stderr)
     else:
-        by_codes([_colors['RED']], lineInfo, *args)
+        by_codes([_colors['RED']], line_info, *args)
 
 
 def print_stack():
@@ -150,10 +150,10 @@ def _one_opt(opt):
     return lambda *args: log([opt], *args)
 
 
-def _bg_color_shorthand(bgColor):
+def _bg_color_shorthand(bg_color):
     def with_bg_color(*args):
         try:
-            log([bgColor, _fontColorForBGs[bgColor.upper()]], *args)
+            log([bg_color, _fontColorForBGs[bg_color.upper()]], *args)
         except KeyError:
             _show('BG_COLORS', _bgColors)
 
