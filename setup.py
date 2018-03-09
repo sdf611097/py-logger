@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name = 'ctlogger',
     packages = ['ctlogger'],
-    version = '0.0.1',
+    version = '0.0.2',
     description = 'A python log utils',
     author = 'ChunTing Lin',
     author_email = 'sdf611097@gmail.com',

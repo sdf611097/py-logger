@@ -15,7 +15,7 @@ ENABLE_LINE_INFO_TO_STDERR = os.environ.get(ENV_LINE_INFO_TO_STDERR)
 time_format = '[%m-%d %H:%M:%S]'
 
 END = '\x1b[0m'
-_bgColors = {
+__bgColors = {
     'BG_BLACK': '40',
     'BG_RED': '41',
     'BG_GREEN': '42',
@@ -26,7 +26,7 @@ _bgColors = {
     'BG_WHITE': '47',
 }
 
-_effects = {
+__effects = {
     'RESET': '0',  # all attributes off
     'BOLD': '1',  # Bold or increased intensity
     'FAINT': '2',  # Faint (decreased intensity), Not widely supported.
@@ -34,7 +34,7 @@ _effects = {
     'UNDERLINE': '4',
 }
 
-_colors = {
+__colors = {
     'BLACK': '30',
     'RED': '31',
     'GREEN': '32',
@@ -45,7 +45,7 @@ _colors = {
     'WHITE': '37',
 }
 
-_fontColorForBGs = {
+__fontColorForBGs = {
     'BG_BLACK': 'WHITE',
     'BG_RED': 'CYAN',
     'BG_GREEN': 'MAGENTA',
@@ -56,14 +56,14 @@ _fontColorForBGs = {
     'BG_WHITE': 'BLACK',
 }
 
-_CODE_DICT = {**_bgColors, **_effects, **_colors}
+__CODE_DICT = {**__bgColors, **__effects, **__colors}
 
 
 def get_all_options():
-    return _CODE_DICT.keys()
+    return __CODE_DICT.keys()
 
 
-def _transform_codes(codes):
+def __transform_codes(codes):
     return '\x1b[' + ';'.join(codes) + 'm'
 
 
@@ -72,7 +72,7 @@ def by_codes(codes, *args, **kwargs):
     This is core function
     """
     arguments = list(args)
-    arguments.insert(0, _transform_codes(codes))
+    arguments.insert(0, __transform_codes(codes))
     if ENABLE_TIME_PREFIX:
         arguments.insert(0, time.strftime(time_format))
 
@@ -80,29 +80,29 @@ def by_codes(codes, *args, **kwargs):
     print(*arguments, **kwargs)
 
 
-def _show(title, d):
+def __show(title, d):
     cyan(title)
     italic(', '.join(d.keys()))
 
 
 def show_opts():
     """
-    BG_COLORS
+    BG__colors
     BG_BLACK, BG_RED, BG_GREEN, BG_YELLOW, BG_BLUE, BG_MAGENTA, BG_CYAN, BG_WHITE
     EFFECTS
     RESET, BOLD, FAINT, ITALIC, UNDERLINE
     COLORS
     BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
     """
-    _show('BG_COLORS', _bgColors)
-    _show('EFFECTS', _effects)
-    _show('COLORS', _colors)
+    __show('BG__colors', __bgColors)
+    __show('EFFECTS', __effects)
+    __show('COLORS', __colors)
 
 
-def _opts_to_codes(opts):
+def __opts_to_codes(opts):
     opts_upper = [opt.upper() for opt in opts]
     try:
-        codes = [_CODE_DICT[opt] for opt in opts_upper]
+        codes = [__CODE_DICT[opt] for opt in opts_upper]
         return codes
     except KeyError:
         opts.insert(0, 'Unexpected options:')
@@ -112,7 +112,7 @@ def _opts_to_codes(opts):
 
 
 def log(opts, *args):
-    codes = _opts_to_codes(opts)
+    codes = __opts_to_codes(opts)
     if codes:
         by_codes(codes, *args)
 
@@ -126,9 +126,9 @@ def print_line_info(*args, **kwargs):
     (filename, line_number, function_name, _, _) = inspect.getframeinfo(previous_frame)
     line_info = filename + ':' + str(line_number) + '/' + function_name
     if ENABLE_LINE_INFO_TO_STDERR:
-        by_codes([_colors['RED']], line_info, *args, file=stderr)
+        by_codes([__colors['RED']], line_info, *args, file=stderr)
     else:
-        by_codes([_colors['RED']], line_info, *args)
+        by_codes([__colors['RED']], line_info, *args)
 
 
 def print_stack():
@@ -142,57 +142,58 @@ def debug(opts, *args):
         log(opts, *args)
 
 
-def _one_opt(opt):
+def __one_opt(opt):
     return lambda *args: log([opt], *args)
 
 
-def _bg_color_shorthand(bg_color):
+def __bg_color_shorthand(bg_color):
     def with_bg_color(*args):
         try:
-            log([bg_color, _fontColorForBGs[bg_color.upper()]], *args)
+            log([bg_color, __fontColorForBGs[bg_color.upper()]], *args)
         except KeyError:
-            _show('BG_COLORS', _bgColors)
+            __show('BG__colors', __bgColors)
 
     return with_bg_color
 
 
 def start(*opts):
-    codes = _opts_to_codes(opts)
-    print(_transform_codes(codes), end='')
+    codes = __opts_to_codes(opts)
+    print(__transform_codes(codes), end='')
 
 
 def end():
     # Once start with bg color
     # Although using RESET to clear bgColor, but the spaces at the end still remain 1 line
     # Seems there a bug on osx?
-    print(_transform_codes(['21', '22', '23', '24', _effects['RESET']]), end='')
+    print(__transform_codes(['21', '22', '23', '24', __effects['RESET']]), end='')
 
 
-black = _one_opt('black')
-red = _one_opt('red')
-green = _one_opt('green')
-yellow = _one_opt('yellow')
-blue = _one_opt('blue')
-magenta = _one_opt('magenta')
-cyan = _one_opt('cyan')
-white = _one_opt('white')
+black = __one_opt('black')
+red = __one_opt('red')
+green = __one_opt('green')
+yellow = __one_opt('yellow')
+blue = __one_opt('blue')
+magenta = __one_opt('magenta')
+cyan = __one_opt('cyan')
+white = __one_opt('white')
 
-bold = _one_opt('bold')
-faint = _one_opt('faint')
-italic = _one_opt('italic')
-underline = _one_opt('underline')
+bold = __one_opt('bold')
+faint = __one_opt('faint')
+italic = __one_opt('italic')
+underline = __one_opt('underline')
 
-bgBlack = _bg_color_shorthand('bg_black')
-bgRed = _bg_color_shorthand('bg_red')
-bgGreen = _bg_color_shorthand('bg_green')
-bgYellow = _bg_color_shorthand('bg_yellow')
-bgBlue = _bg_color_shorthand('bg_blue')
-bgMagenta = _bg_color_shorthand('bg_magenta')
-bgCyan = _bg_color_shorthand('bg_cyan')
-bgWhite = _bg_color_shorthand('bg_white')
+#below are functions so they should be snake_case
+bg_black = __bg_color_shorthand('bg_black')
+bg_red = __bg_color_shorthand('bg_red')
+bg_green = __bg_color_shorthand('bg_green')
+bg_yellow = __bg_color_shorthand('bg_yellow')
+bg_blue = __bg_color_shorthand('bg_blue')
+bg_magenta = __bg_color_shorthand('bg_magenta')
+bg_cyan = __bg_color_shorthand('bg_cyan')
+bg_white = __bg_color_shorthand('bg_white')
 
 if __name__ == '__main__':
-    by_codes([_colors['RED'], _effects['ITALIC'], _bgColors['BG_GREEN']], 1, 2, 3)
+    by_codes([__colors['RED'], __effects['ITALIC'], __bgColors['BG_GREEN']], 1, 2, 3)
 
     log(['red', 'Bg_Yellow', 'wrongOpt'], 3, 4, 5)
     debug(['BG_CYAN'], 'this is debug msg')
@@ -214,7 +215,7 @@ if __name__ == '__main__':
     green(123, 'abc')
     cyan('aa')
 
-    bgYellow('log with bg yellow')
+    bg_yellow('log with bg yellow')
     print('start', 'italic blue bg_green')
 
     start('italic', 'blue', 'bg_green')

@@ -11,27 +11,33 @@ RESET, BOLD, FAINT, ITALIC, UNDERLINE
 #COLORS
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
 ```
+
 ## Usages
+
 ### Time prefix
 Set your environment variable ENABLE_TIME_PREFIX=1, each log from logger will contians time prefix with format [%m-%d %H:%M:%S]
+
 ### color(arg1, arg2, ...)
-Usage is just like print(), but the log will with color which you specified.
+Like print(), but the log is with color which you specified.
 ```python
 logger.cyan('this', 'is', 'a', 'cyan', 'log')
 logger.red(1, 2, 3)
 ```
-## bgColor(arg1, arg2, ...)
+
+## bg_color(arg1, arg2, ...)
 Simalar to color(), this funciton is for background color and the font-color will be complementary color.
 ```python
-logger.bgBlue('this', 'log', 'is', 'blue', 'and with background color yellow')
+logger.bg_blue('this', 'background color blue, and font is yellow')
 ```
+
 ### log(optList, arg1, arg2, ...)
 print log with options(possible options are shown above) and option is case-insensitive.
 ```python
 logger.log(['red','Bg_Yellow'], 3,4,5) #print 3,4,5 (with font-color:red, backgroud is yellow)
 logger.log(['blue', 'Bold'], 'this', 'is', 'a', 'blue-Bold', 'log')
-logger.log(['BG_BLUE', 'YELLOW'], 'this', 'is', 'as', 'same', 'as', 'logger.bgBlue')
+logger.log(['BG_BLUE', 'YELLOW'], 'this', 'is', 'as', 'same', 'as', 'logger.bg_blue')
 ```
+
 ### start(*opts), end()
 You can set optsm and then below log from print will apply this opts util end() be called.
 ```python
@@ -41,34 +47,35 @@ logger.end()
 print('this is normal log')
 ```
 
-### byCodes(codeList, arg1, arg2, ...)
-If you know the code of SGR (Select Graphic Rendition) parameters, you can pass it directly(string list).
+### by_codes(codeList, arg1, arg2, ...)
+You can pass other codes, and try it.
+Find more codes: [ANSI ESCAPE CODE](https://en.wikipedia.org/wiki/ANSI_escape_code)
 ```python
-logger.byCodes(['31','4'], "this is equl to logger.log(['red','underline'], ...)")
+logger.by_codes(['31','4'], "this is equl to logger.log(['red','underline'], ...)")
 ```
 
-### showOpts()
+### show_opts()
 Once you forgot which option can be use, you can call this function to see all options.
 ```python
-logger.showOpts()
+logger.show_opts()
 ```
 
 ### debug()
-This log will be print only if the env variable VERBOSE been set.
+This log will be print only if the env variable VERBOSE be set.
 ```python
 logger.debug('shows only when', 'VERBOSE', 'been', 'set')
 ```
 
-### printLineInfo(arg1, arg2...) printStack()
+### print_line_info(arg1, arg2...) print_stack()
 ```python
-def test():
-    printLineInfo('1','2') # <YOUR_FILE_NAME>:12/test 1 2 
-    printStack() 
-    #<YOUR_FILE_NAME>:13/test logger.printStack()
-    #<YOUR_FILE_NAME>:18/a test()
-    #<YOUR_FILE_NAME>:19/<module> a()
+def bar():
+    print_line_info('1','2') # <YOUR_FILE_NAME>:12/bar 1 2 
+    print_stack()
+    #<YOUR_FILE_NAME>:13/bar logger.printStack()
+    #<YOUR_FILE_NAME>:18/foo bar()
+    #<YOUR_FILE_NAME>:19/<module> foo()
     #...
-def a():
-    test()
-a()
+def foo():
+    bar()
+foo()
 ```
