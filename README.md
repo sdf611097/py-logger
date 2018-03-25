@@ -1,5 +1,17 @@
 # ctlogger
-Log tool can help you see log more efficirently, by colors, prefix with time, show line number and so on.
+Log tool can help you see log more efficiently, by colors, prefix with time, show line number and so on.
+
+# How to use
+Install by pip
+```
+pip install ctlogger
+pip install --upgrade ctlogger
+```
+Use
+```
+from ctlogger import logger
+logger.yellow('This is a yellow log')
+```
 
 
 ## Effects
@@ -25,7 +37,7 @@ logger.red(1, 2, 3)
 ```
 
 ## bg_color(arg1, arg2, ...)
-Simalar to color(), this funciton is for background color and the font-color will be complementary color.
+Similar to color(), this function is for background color and the font-color will be complementary color.
 ```python
 logger.bg_blue('this', 'background color blue, and font is yellow')
 ```
@@ -39,7 +51,7 @@ logger.log(['BG_BLUE', 'YELLOW'], 'this', 'is', 'as', 'same', 'as', 'logger.bg_b
 ```
 
 ### start(*opts), end()
-You can set optsm and then below log from print will apply this opts util end() be called.
+You can set opts and then below log from print will apply this opts until end() be called.
 ```python
 logger.start('yellow','bold')
 print('this is yellow and bold')
@@ -69,7 +81,7 @@ logger.debug('shows only when', 'VERBOSE', 'been', 'set')
 ### print_line_info(arg1, arg2...) print_stack()
 ```python
 def bar():
-    print_line_info('1','2') # <YOUR_FILE_NAME>:12/bar 1 2 
+    print_line_info('1','2') # <YOUR_FILE_NAME>:12/bar 1 2
     print_stack()
     #<YOUR_FILE_NAME>:13/bar logger.printStack()
     #<YOUR_FILE_NAME>:18/foo bar()
@@ -79,3 +91,21 @@ def foo():
     bar()
 foo()
 ```
+
+### Notify
+slack, sendgrid is supported
+```
+export SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXX/OOO/QQQ
+
+export SENDGRID_API_KEY=SG.XXXXX.XXXX
+export EMAIL_FROM=sender@example.com
+export EMAIL_TO=receiver0@example.com,receiver1@example.com
+```
+```python
+from ctlogger import slack, sendgrid
+res = sendgrid.send('SG title', 'SG message')
+assert res.status_code == 202
+res = slack.send('Slack title', 'Slack message')
+assert res.status_code == 200
+```
+
