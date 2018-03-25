@@ -88,7 +88,8 @@ def __show(title, d):
 def show_opts():
     """
     BG__colors
-    BG_BLACK, BG_RED, BG_GREEN, BG_YELLOW, BG_BLUE, BG_MAGENTA, BG_CYAN, BG_WHITE
+    BG_BLACK, BG_RED, BG_GREEN, BG_YELLOW, BG_BLUE,
+    BG_MAGENTA, BG_CYAN, BG_WHITE
     EFFECTS
     RESET, BOLD, FAINT, ITALIC, UNDERLINE
     COLORS
@@ -119,8 +120,9 @@ def log(opts, *args):
 
 def print_line_info(*args, **kwargs):
     """
-    This function will print Filename/functionName:line at beggining.
-    You can set environment variable LINE_INFO_TO_STDERR=1 to print this one to stderr
+    Print Filename:line/functionName at beggining.
+    You can set environment variable LINE_INFO_TO_STDERR=1
+    to print this one to stderr
     """
     previous_frame = inspect.currentframe().f_back
     (filename, line_number, function_name, _, _) = inspect.getframeinfo(previous_frame)
@@ -163,7 +165,8 @@ def start(*opts):
 
 def end():
     # Once start with bg color
-    # Although using RESET to clear bgColor, but the spaces at the end still remain 1 line
+    # Although using RESET to clear bgColor,
+    # but the spaces at the end still remain 1 line
     # Seems there a bug on osx?
     print(__transform_codes(['21', '22', '23', '24', __effects['RESET']]), end='')
 
@@ -182,7 +185,7 @@ faint = __one_opt('faint')
 italic = __one_opt('italic')
 underline = __one_opt('underline')
 
-#below are functions so they should be snake_case
+# below are functions so they should be snake_case
 bg_black = __bg_color_shorthand('bg_black')
 bg_red = __bg_color_shorthand('bg_red')
 bg_green = __bg_color_shorthand('bg_green')
@@ -200,15 +203,12 @@ if __name__ == '__main__':
 
     print_line_info()
 
-
     def test():
         print_line_info('1', '2')
         print_stack()
 
-
     def a():
         test()
-
 
     a()
 
